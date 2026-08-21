@@ -1,55 +1,65 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="modelo.Producto" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
+<%@ page import="modelo.Producto" %>
+<%@ page import="modelo.Proveedor" %>
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Gestión de Inventario - MiniStock</title>
+    <title>Gestión de Productos - MiniStock</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f9; margin: 30px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
-        form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 30px; background: #eef2f7; padding: 20px; border-radius: 8px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { font-weight: bold; margin-bottom: 5px; color: #34495e; }
-        input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-        .btn-container { grid-column: span 3; display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
-        button { padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
-        .btn-add { background-color: #27ae60; }
-        .btn-clean { background-color: #7f8c8d; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #34495e; color: white; }
-        tr:hover { background-color: #f1f1f1; }
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        .nav { margin-bottom: 20px; }
+        .nav a { margin-right: 15px; text-decoration: none; color: #0288d1; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #0288d1; color: white; }
+        .form-container { background: #f5f5f5; padding: 15px; border-radius: 5px; width: 320px; }
+        input, select { width: 95%; padding: 8px; margin: 5px 0 12px 0; }
+        button { background: #0288d1; color: white; border: none; padding: 10px 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Gestión de Inventario - MiniStock Cloud</h1>
+    <div class="nav">
+        <a href="ProductoServlet">Gestión de Productos</a> | 
+        <a href="ProveedorServlet">Gestión de Proveedores</a>
+    </div>
 
-    <!-- FORMULARIO ENVIANDO DATOS POR MÉTODO POST AL SERVLET puente -->
-    <form action="ProductoServlet" method="POST">
-        <div class="form-group">
-            <label>Código:</label>
-            <input type="text" name="codigo" placeholder="Ej: P002" required>
-        </div>
-        <div class="form-group">
-            <label>Descripción:</label>
-            <input type="text" name="descripcion" placeholder="Ej: Leche Entera" required>
-        </div>
-        <div class="form-group">
-            <label>Precio ($):</label>
-            <input type="number" step="0.01" name="precio" placeholder="Ej: 3500" required>
-        </div>
-        <div class="btn-container">
-            <button type="submit" class="btn-add">Guardar Producto</button>
-            <button type="reset" class="btn-clean">Limpiar</button>
-        </div>
-    </form>
+    <h2>Registrar Nuevo Producto</h2>
+    <div class="form-container">
+        <form action="ProductoServlet" method="POST">
+            <label>ID Producto:</label><br>
+            <input type="number" name="id" required><br>
 
-    <!-- TABLA QUE RECORRE LOS DATOS ENVIADOS DESDE EL SERVLET POR GET -->
+            <label>Código:</label><br>
+            <input type="text" name="codigo" required><br>
+
+            <label>Descripción:</label><br>
+            <input type="text" name="descripcion" required><br>
+
+            <label>Precio:</label><br>
+            <input type="number" step="0.01" name="precio" required><br>
+
+            <label>Proveedor:</label><br>
+            <select name="proveedorId" required>
+                <option value="">-- Seleccione un Proveedor --</option>
+                <%
+                    List<Proveedor> proveedores = (List<Proveedor>) request.getAttribute("listaProveedores");
+                    if (proveedores != null) {
+                        for (Proveedor prov : proveedores) {
+                %>
+                    <option value="<%= prov.getId() %>"><%= prov.getNombreProveedor() %></option>
+                <%
+                        }
+                    }
+                %>
+            </select><br>
+
+            <button type="submit">Guardar Producto</button>
+        </form>
+    </div>
+
+    <h2>Lista de Productos Registrados</h2>
     <table>
         <thead>
             <tr>
@@ -57,32 +67,34 @@
                 <th>Código</th>
                 <th>Descripción</th>
                 <th>Precio</th>
+                <th>Proveedor Asignado</th>
             </tr>
         </thead>
         <tbody>
             <%
-                // Recuperamos la lista que nos envía el Servlet
-                List<Producto> lista = (List<Producto>) request.getAttribute("listaProductos");
-                if (lista != null && !lista.isEmpty()) {
-                    for (Producto p : lista) {
+                List<Producto> productos = (List<Producto>) request.getAttribute("listaProductos");
+                if (productos != null && !productos.isEmpty()) {
+                    for (Producto p : productos) {
             %>
             <tr>
                 <td><%= p.getId() %></td>
                 <td><%= p.getCodigo() %></td>
                 <td><%= p.getDescripcion() %></td>
-                <td>$<%= String.format("%.2f", p.getPrecio()) %></td>
+                <td>$<%= p.getPrecio() %></td>
+                <td><%= p.getNombreProveedor() %></td>
             </tr>
-            <% 
+            <%
                     }
                 } else {
             %>
             <tr>
-                <td colspan="4" style="text-align: center;">No hay productos registrados.</td>
+                <td colspan="5">No hay productos registrados.</td>
             </tr>
-            <% } %>
+            <%
+                }
+            %>
         </tbody>
     </table>
-</div>
 
 </body>
 </html>

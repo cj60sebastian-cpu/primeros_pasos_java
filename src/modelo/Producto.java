@@ -4,27 +4,20 @@ public class Producto {
     private int id;
     private String codigo;
     private String descripcion;
-    private int precio;
+    private double precio;
+    private int proveedorId;
+    private String nombreProveedor; // Para mostrar en la tabla del JSP
 
-    // Constructor vacío para insertar filas nuevas en la base de datos
     public Producto() {}
 
-    // Constructor completo (con ID, para consultas)
-    public Producto(int id, String codigo, String descripcion, int precio) {
+    public Producto(int id, String codigo, String descripcion, double precio, int proveedorId) {
         this.id = id;
         this.codigo = codigo;
         this.descripcion = descripcion;
         this.precio = precio;
+        this.proveedorId = proveedorId;
     }
 
-    // Constructor sin ID (para nuevos registros) la base esta en + autoincremento
-    public Producto(String codigo, String descripcion, int precio) {
-        this.codigo = codigo;
-        this.descripcion = descripcion;
-        this.precio = precio;
-    }
-
-    // Getters y Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -34,11 +27,12 @@ public class Producto {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public int getPrecio() { return precio; }
-    public void setPrecio(int precio) { this.precio = precio; }
+    public double getPrecio() { return precio; }
+    public void setPrecio(double precio) { this.precio = precio; }
 
-    @Override
-    public String toString() {
-        return "ID: " + id + " | Código: " + codigo + " | Descripcion: " + descripcion + " | Precio: $" + precio;
-    }
+    public int getProveedorId() { return proveedorId; }
+    public void setProveedorId(int proveedorId) { this.proveedorId = proveedorId; }
+
+    public String getNombreProveedor() { return nombreProveedor; }
+    public void setNombreProveedor(String nombreProveedor) { this.nombreProveedor = nombreProveedor; }
 }

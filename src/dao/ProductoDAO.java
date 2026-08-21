@@ -1,86 +1,58 @@
 package dao;
 
-import util.ConexionBD;
-import modelo.Producto;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import modelo.Producto;
+import util.ConexionBD;
 
 public class ProductoDAO {
 
-    // 1. INSERCIÓN (Crear) off & apagado 
-    public boolean insertar(Producto p) {
-        String sql = "INSERT INTO productos (codigo, descripcion, precio) VALUES (?, ?, ?)";
-        try (Connection cn = ConexionBD.conectar();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            ps.setString(1, p.getCodigo());
-            ps.setString(2, p.getDescripcion());
-            ps.setInt(3, p.getPrecio());
-
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.err.println("Error al insertar producto: " + e.getMessage());
-            return false;
-        }
-    }
-
-    // 2. CONSULTA (Leer todos)
     public List<Producto> listar() {
         List<Producto> lista = new ArrayList<>();
-        String sql = "SELECT id_, codigo, descripcion, precio FROM productos";
-        try (Connection cn = ConexionBD.conectar();
-             PreparedStatement ps = cn.prepareStatement(sql);
+        String sql = "SELECT p.id_, p.codigo, p.descripcion, p.precio, p.provedores_id, pr.nombre_provedor " +
+                     "FROM productos p LEFT JOIN provedores pr ON p.provedores_id = pr.id_";
+
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Producto p = new Producto(
-                    rs.getInt("id_"),
-                    rs.getString("codigo"),
-                    rs.getString("descripcion"),
-                    rs.getInt("precio")
-                );
+                Producto p = new Producto();
+                p.setId(rs.getInt("id_"));
+                p.setCodigo(rs.getString("codigo"));
+                p.setDescripcion(rs.getString("descripcion"));
+                p.setPrecio(rs.getDouble("precio"));
+                p.setProveedorId(rs.getInt("provedores_id"));
+                p.setNombreProveedor(rs.getString("nombre_provedor") != null ? rs.getString("nombre_provedor") : "Sin Proveedor");
                 lista.add(p);
             }
         } catch (SQLException e) {
-            System.err.println("Error al consultar productos: " + e.getMessage());
+            e.printStackTrace();
         }
         return lista;
     }
 
-    // 3. ACTUALIZACIÓN (Modificar)
-    public boolean actualizar(Producto p) {
-        String sql = "UPDATE productos SET codigo = ?, descripcion = ?, precio = ? WHERE id_ = ?";
-        try (Connection cn = ConexionBD.conectar();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+    public boolean insertar(Producto p) {
+        String sql = "INSERT INTO productos (id_, codigo, descripcion, precio, provedores_id) VALUES (?, ?, ?, ?, ?)";
 
-            ps.setString(1, p.getCodigo());
-            ps.setString(2, p.getDescripcion());
-            ps.setInt(3, p.getPrecio());
-            ps.setInt(4, p.getId());
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, p.getId());
+            ps.setString(2, p.getCodigo());
+            ps.setString(3, p.getDescripcion());
+            ps.setDouble(4, p.getPrecio());
+
+            if (p.getProveedorId() > 0) {
+                ps.setInt(5, p.getProveedorId());
+            } else {
+                ps.setNull(5, Types.INTEGER);
+            }
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al actualizar producto: " + e.getMessage());
-            return false;
-        }
-    }
-
-    // 4. ELIMINACIÓN (Borrar)
-    public boolean eliminar(int id) {
-        String sql = "DELETE FROM productos WHERE id_ = ?";
-        try (Connection cn = ConexionBD.conectar();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Error al eliminar producto: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
