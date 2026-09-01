@@ -1,3 +1,9 @@
 {
-  "java.project.referencedLibraries": ["lib/**/*.jar"]
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "backend/src/lib/jakarta.servlet-api-6.0.0.jar",
+    "backend/src/lib/gson-2.10.1.jar"
+  ],
+  "java.project.sourcePaths": ["backend/src"],
+  "java.project.outputPath": "backend/WEB-INF/classes"
 }
