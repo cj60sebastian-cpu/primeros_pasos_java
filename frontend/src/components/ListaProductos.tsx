@@ -1,54 +1,50 @@
 import React from "react";
 
-export interface Producto {
+interface Producto {
   id?: number;
-  nombre: string;
+  codigo: string;
+  descripcion: string;
   precio: number;
-  stock: number;
-  categoria: string;
+  proveedorId?: number;
 }
 
-interface ListaProductosProps {
+interface Props {
   productos: Producto[];
 }
 
-export const ListaProductos: React.FC<ListaProductosProps> = ({
-  productos,
-}) => {
+export const ListaProductos: React.FC<Props> = ({ productos }) => {
   return (
-    <div style={{ padding: "10px" }}>
+    <div>
       <h2>Inventario de Productos</h2>
-
       <table
         border={1}
         cellPadding={8}
-        cellSpacing={0}
-        style={{ width: "100%", textAlign: "left", marginTop: "10px" }}
+        style={{ width: "100%", borderCollapse: "collapse" }}
       >
         <thead>
           <tr>
-            <th>Nombre</th>
+            <th>Código</th>
+            <th>Descripción</th>
             <th>Precio</th>
-            <th>Stock / Cantidad</th>
-            <th>Categoría</th>
+            <th>Categoría / Proveedor ID</th>
           </tr>
         </thead>
         <tbody>
-          {productos && productos.length > 0 ? (
-            productos.map((prod: any, index: number) => (
-              <tr key={prod.id || index}>
-                <td>{prod.nombre || prod.nombreProducto || "N/A"}</td>
-                <td>${prod.precio ?? 0}</td>
-                <td>{prod.stock ?? prod.cantidad ?? 0}</td>
-                <td>{prod.categoria || "General"}</td>
-              </tr>
-            ))
-          ) : (
+          {productos.length === 0 ? (
             <tr>
               <td colSpan={4} style={{ textAlign: "center" }}>
                 No hay productos registrados en el inventario.
               </td>
             </tr>
+          ) : (
+            productos.map((prod) => (
+              <tr key={prod.id || prod.codigo}>
+                <td>{prod.codigo}</td>
+                <td>{prod.descripcion || "N/A"}</td>
+                <td>${prod.precio}</td>
+                <td>{prod.proveedorId ?? "General"}</td>
+              </tr>
+            ))
           )}
         </tbody>
       </table>

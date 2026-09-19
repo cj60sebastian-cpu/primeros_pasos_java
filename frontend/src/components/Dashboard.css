@@ -1,0 +1,133 @@
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+/* Sidebar Lateral */
+.sidebar {
+  width: 260px;
+  background-color: #1e293b;
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 1rem;
+}
+
+.sidebar-brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 2rem;
+  padding-left: 0.5rem;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.menu-item:hover,
+.menu-item.active {
+  background-color: #0f172a;
+  color: #38bdf8;
+}
+
+.btn-logout {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+  background-color: #dc2626;
+}
+
+/* Contenido Principal */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.main-header {
+  margin-bottom: 2rem;
+}
+
+.main-header h1 {
+  font-size: 1.75rem;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* Grid de Productos */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  border: 1px solid #e2e8f0;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.product-img {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+.product-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.product-stock {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}

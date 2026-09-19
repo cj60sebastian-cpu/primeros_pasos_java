@@ -1,121 +1,105 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import type { Producto } from "./ListaProductos";
 
-interface FormProductoProps {
-  onGuardar: (nuevoProducto: Producto) => Promise<void>;
+interface ProductoInput {
+  codigo: string;
+  descripcion: string;
+  precio: number;
+  proveedorId: number;
 }
 
-export const FormProducto: React.FC<FormProductoProps> = ({ onGuardar }) => {
-  const navigate = useNavigate();
+interface Props {
+  onGuardar: (producto: ProductoInput) => void;
+}
 
-  const [producto, setProducto] = useState<Omit<Producto, "id">>({
-    nombre: "",
-    precio: 0,
-    stock: 0,
-    categoria: "",
-  });
+export const FormProducto: React.FC<Props> = ({ onGuardar }) => {
+  const [codigo, setCodigo] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [precio, setPrecio] = useState("");
+  const [proveedorId, setProveedorId] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setProducto((prev) => ({
-      ...prev,
-      [name]: name === "precio" || name === "stock" ? Number(value) : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      // 1. Enviar los datos al backend mediante la prop
-      await onGuardar(producto as Producto);
 
-      // 2. Alerta de éxito
-      alert("¡Producto guardado exitosamente!");
-
-      // 3. Redirección al inventario para visualizar la lista actualizada
-      navigate("/");
-    } catch (error) {
-      console.error("Error al guardar el producto:", error);
-      alert("Ocurrió un error al guardar el producto.");
+    if (!codigo || !descripcion || !precio) {
+      alert("Por favor completa todos los campos requeridos.");
+      return;
     }
+
+    onGuardar({
+      codigo,
+      descripcion,
+      precio: parseFloat(precio),
+      proveedorId: proveedorId ? parseInt(proveedorId) : 0,
+    });
+
+    setCodigo("");
+    setDescripcion("");
+    setPrecio("");
+    setProveedorId("");
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "20px auto" }}>
-      <h2>Registrar Nuevo Producto</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px" }}>
-            Nombre:
-          </label>
-          <input
-            type="text"
-            name="nombre"
-            value={producto.nombre}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </div>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        maxWidth: "400px",
+      }}
+    >
+      <h2>Registrar Producto</h2>
 
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px" }}>
-            Precio:
-          </label>
-          <input
-            type="number"
-            name="precio"
-            step="0.01"
-            value={producto.precio}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </div>
+      <div>
+        <label>Código:</label>
+        <input
+          type="text"
+          value={codigo}
+          onChange={(e) => setCodigo(e.target.value)}
+          required
+          style={{ width: "100%", padding: "8px" }}
+        />
+      </div>
 
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px" }}>
-            Stock / Material:
-          </label>
-          <input
-            type="number"
-            name="stock"
-            value={producto.stock}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </div>
+      <div>
+        <label>Descripción / Nombre:</label>
+        <input
+          type="text"
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+          required
+          style={{ width: "100%", padding: "8px" }}
+        />
+      </div>
 
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px" }}>
-            Categoría:
-          </label>
-          <input
-            type="text"
-            name="categoria"
-            value={producto.categoria}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </div>
+      <div>
+        <label>Precio:</label>
+        <input
+          type="number"
+          step="0.01"
+          value={precio}
+          onChange={(e) => setPrecio(e.target.value)}
+          required
+          style={{ width: "100%", padding: "8px" }}
+        />
+      </div>
 
-        <button
-          type="submit"
-          style={{
-            padding: "10px 15px",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Guardar Producto
-        </button>
-      </form>
-    </div>
+      <div>
+        <label>ID Proveedor (Opcional):</label>
+        <input
+          type="number"
+          value={proveedorId}
+          onChange={(e) => setProveedorId(e.target.value)}
+          style={{ width: "100%", padding: "8px" }}
+        />
+      </div>
+
+      <button
+        type="submit"
+        style={{ padding: "10px", marginTop: "10px", cursor: "pointer" }}
+      >
+        Guardar Producto
+      </button>
+    </form>
   );
 };
