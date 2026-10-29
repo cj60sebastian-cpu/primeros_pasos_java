@@ -10,9 +10,10 @@ interface Producto {
 
 interface Props {
   productos: Producto[];
+  onDelete: (codigo: string) => void;
 }
 
-export const ListaProductos: React.FC<Props> = ({ productos }) => {
+export const ListaProductos: React.FC<Props> = ({ productos, onDelete }) => {
   return (
     <div>
       <h2>Inventario de Productos</h2>
@@ -27,6 +28,7 @@ export const ListaProductos: React.FC<Props> = ({ productos }) => {
             <th>Descripción</th>
             <th>Precio</th>
             <th>Categoría / Proveedor ID</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -43,6 +45,23 @@ export const ListaProductos: React.FC<Props> = ({ productos }) => {
                 <td>{prod.descripcion || "N/A"}</td>
                 <td>${prod.precio}</td>
                 <td>{prod.proveedorId ?? "General"}</td>
+                <td>
+                  <button
+                    onClick={() => onDelete(prod.codigo)}
+                    style={{
+                      backgroundColor: "#fee2e2",
+                      color: "#dc2626",
+                      border: "none",
+                      padding: "6px 12px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    🗑️ Eliminar
+                  </button>
+                </td>
+                ))
               </tr>
             ))
           )}

@@ -17,7 +17,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState("productos");
   const [productosBD, setProductosBD] = useState<Producto[]>([]);
 
-  // Estados para Control de Carga y Errores superando el recto
+  // Estados para Control de Carga y Errores
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState("");
   const [mensajeExito, setMensajeExito] = useState("");
@@ -30,7 +30,33 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     imagen_url: "",
   });
 
-  // Función para obtener productos desde la API,yaesta trabajando con mySQL y Tomcat
+  // Función para eliminar un producto
+  const handleDelete = async (codigo: string) => {
+    if (
+      window.confirm(
+        `¿Estás seguro de que deseas eliminar el producto con código ${codigo}?`,
+      )
+    ) {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/backend/ProductosServlet?accion=eliminar&codigo=${codigo}`,
+          {
+            method: "POST", // Se mantiene POST para evitar problemas de CORS con Tomcat
+          },
+        );
+        if (response.ok) {
+          setProductosBD(productosBD.filter((p: any) => p.codigo !== codigo));
+        } else {
+          alert("No se pudo eliminar el producto en el servidor.");
+        }
+      } catch (error) {
+        console.error("Error de red:", error);
+        alert("Error al conectar con el servidor.");
+      }
+    }
+  };
+
+  // Función para obtener productos desde la API
   const obtenerProductos = async () => {
     setCargando(true);
     setErrorCarga("");
@@ -68,20 +94,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     setErrorCarga("");
     setMensajeExito("");
 
+    // Formatear los datos como URLSearchParams para que Java (request.getParameter) los pueda leer
+    const params = new URLSearchParams();
+    params.append("accion", "guardar");
+    params.append("codigo", nuevoProducto.codigo);
+    params.append("precio", nuevoProducto.precio);
+    params.append("descripcion", nuevoProducto.descripcion);
+    params.append(
+      "imagen_url",
+      nuevoProducto.imagen_url ||
+        "https://cdn-icons-png.flaticon.com/512/3081/3081559.png",
+    );
+
     try {
       const response = await fetch(
         "http://localhost:8080/backend/ProductosServlet",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            codigo: nuevoProducto.codigo,
-            precio: parseFloat(nuevoProducto.precio),
-            descripcion: nuevoProducto.descripcion,
-            imagen_url:
-              nuevoProducto.imagen_url ||
-              "https://cdn-icons-png.flaticon.com/512/3081/3081559.png",
-          }),
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: params,
         },
       );
 
@@ -93,7 +124,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           descripcion: "",
           imagen_url: "",
         });
-        obtenerProductos(); // Recargar la lista de productos con el estado activeTAB
+        obtenerProductos();
       } else {
         setErrorCarga("Error al intentar registrar el producto.");
       }
@@ -295,6 +326,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     >
                       ${prod.precio}
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(prod.codigo)}
+                      style={{
+                        marginTop: "12px",
+                        padding: "8px 12px",
+                        border: "none",
+                        borderRadius: "6px",
+                        backgroundColor: "#dc2626",
+                        color: "#ffffff",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 ))}
               </div>
